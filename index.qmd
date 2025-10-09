@@ -2,6 +2,7 @@
 title: "Assignment 04 - Public Data Analysis Urban centers "
 author: "Martin Barros & Yosup Shin"
 format: html
+embed-resources: true
 editor: "visual"
 ---
 
