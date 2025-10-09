@@ -1,5 +1,5 @@
 # Assignment 04
 
-**Author:** Martin Barros  
+**Author:** Martin Barros  and Yosup Shin
 
-This repository contains my work for Assignment 04.
+This repository contains our work for Assignment 04.
