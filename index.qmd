@@ -83,3 +83,35 @@ ggplot(data, aes(x = poverty_perc, y = agg_investment_perhh)) +
 ### Interpretation
 
 Following our analysis, we wanted to delve into the relationship between counties with higher poverty rates and the level of aggregate investment per household (measured in USD). The slope of the regression line shows that as poverty grows, investment per household falls. The points are spread out, showing variation, but the trend is clear. Poverty seems to be a meaningful predictor of investment levels, and counties with higher poverty generally attract or sustain less household-level investment. As such, the poorer the household -on average- the more budget constrained and thus the lower willingness to invest. \`\`\`
+
+
+## Third Visualization
+```{r}
+racial_data <- read_excel("data/dc_capital_flows.xlsx", sheet= 4)
+
+racial_data |>
+  mutate(
+    race_cat = factor(race_cat, levels = c("0-20% white", "21-40% white", "41-60% white", "61-80% white", "81+% white",
+        "0-20% Black", "21-40% Black", "41-60% Black", "61-80% Black", "81+% Black","0-10% Hispanic", "11-20% Hispanic", "21-30% Hispanic", "31+% Hispanic","0-5% Asian", "6-10% Asian", "11-20% Asian", "21+% Asian"
+      )
+      )) |>
+  ggplot(aes(x = reorder(race_cat, agg_investment_perhh), y = agg_investment_perhh)) +
+           geom_bar(stat = "identity", fill = "blue", alpha = 0.7) +
+  scale_y_continuous(labels = scales::dollar) +
+           labs(
+             title = "Race vs Aggregate Investment by racial percentage category",
+             x = "Racial Category",
+             y = "Aggregate Investment",
+             caption = "Source - Urban Data Catalog"
+           ) +
+           theme_light() + 
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1) 
+  )
+
+```
+
+### Interpretation
+
+After looking at correlations between poverty rates in each county and Correlation between County Poverty Rate and Aggregate Investment per HH, we analyze if the racial percentage of each household is correlated with aggregate investment in each household (measured in USD). Interestingly, the households with more white racial percentage show higher aggregate investment by household whereas households with more black racial percentage has lower aggregate investment. The mean of the aggregate investment of top 100 counties is approximately 20724 USD. 
+We found this analysis limited since the racial category is not standarized.
