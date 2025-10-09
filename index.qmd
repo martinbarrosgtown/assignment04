@@ -14,7 +14,9 @@ editor: "visual"
 # Load required package
 library(readxl)
 library(tidyverse)
-
+library(tigris)
+library(sf)
+library(scales)
 
 # Read your Excel file from the data/ folder
 data <- read_excel("data/dc_capital_flows.xlsx", sheet = "Top 100 Counties")
@@ -27,17 +29,12 @@ head(data)
 ## First visualization
 
 ```{r}
-mean_poverty <- mean(data$poverty_perc, na.rm = TRUE)
-
-mean_poverty <- mean(data$poverty_perc, na.rm = TRUE)
-
 ggplot(data %>% filter(poverty_perc > 0.20),
        aes(x = reorder(paste0(county_name, ", ", state), poverty_perc),
            y = poverty_perc)) +
   geom_col(fill = "lightgreen") +
   geom_text(aes(label = percent(poverty_perc, accuracy = 0.1)),
             hjust = -0.05, size = 3.5) +
-  geom_hline(yintercept = 0.20, linetype = "dotted", color = "black", size = 1) +
   geom_hline(yintercept = mean_poverty, linetype = "dashed", color = "blue", size = 0.4) +
   coord_flip(clip = "off") +
   scale_y_continuous(labels = percent_format(accuracy = 1),
@@ -58,62 +55,9 @@ ggplot(data %>% filter(poverty_perc > 0.20),
 
 ### Interpretation
 
-The dataset selected contains information of average scaled investment in 100 largest U.S. counties, plus DC region jurisdictions. Prior to delving into any geospatial analysis, we wanted to understand the heterogeneity of poverty in the top 100 countries. Given that the average poverty rate is 13.3%, we decided to start by taking a look at those countries that have a rate of 20% or higher. To do so, we just present a chart listing those counties and their state, together with a blue dashed line stating the mean poverty rate, and a black dotted line showing the 20% or higher benchmark
+The dataset selected contains information of average scaled investment in 100 largest U.S. counties, plus DC region jurisdictions. Prior to delving into any geospatial analysis, we wanted to understand the heterogeneity of poverty in the top 100 countries. Given that the average poverty rate is 13.3%, we decided to start by taking a look at those countries that have a rate of 20% or higher. To do so, we just present a chart listing those counties and their state, together with a blue dashed line stating the mean poverty rate.
 
 ## Second Visualization
-
-```{r}
-ggplot(data, aes(x = poverty_perc, y = agg_investment_perhh)) +
-  geom_point(alpha = 0.5, color = "blue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
-  labs(
-    title = "Correlation between County Poverty Rate and Aggregate Investment per HH",
-    x = "Poverty Rate",
-    y = "Aggregate Investment per Household"
-  ) +
-  theme_minimal(base_size = 10) +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
-
-```
-
-### Interpretation
-
-Following our analysis, we wanted to delve into the relationship between counties with higher poverty rates and the level of aggregate investment per household (measured in USD). The slope of the regression line shows that as poverty grows, investment per household falls. The points are spread out, showing variation, but the trend is clear. Poverty seems to be a meaningful predictor of investment levels, and counties with higher poverty generally attract or sustain less household-level investment. As such, the poorer the household -on average- the more budget constrained and thus the lower willingness to invest. \`\`\`
-
-
-## Third Visualization
-```{r}
-racial_data <- read_excel("data/dc_capital_flows.xlsx", sheet= 4)
-
-racial_data |>
-  mutate(
-    race_cat = factor(race_cat, levels = c("0-20% white", "21-40% white", "41-60% white", "61-80% white", "81+% white",
-        "0-20% Black", "21-40% Black", "41-60% Black", "61-80% Black", "81+% Black","0-10% Hispanic", "11-20% Hispanic", "21-30% Hispanic", "31+% Hispanic","0-5% Asian", "6-10% Asian", "11-20% Asian", "21+% Asian"
-      )
-      )) |>
-  ggplot(aes(x = reorder(race_cat, agg_investment_perhh), y = agg_investment_perhh)) +
-           geom_bar(stat = "identity", fill = "blue", alpha = 0.7) +
-  scale_y_continuous(labels = scales::dollar) +
-           labs(
-             title = "Race vs Aggregate Investment by racial percentage category",
-             x = "Racial Category",
-             y = "Aggregate Investment",
-             caption = "Source - Urban Data Catalog"
-           ) +
-           theme_light() + 
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1) 
-  )
-
-```
-
-### Interpretation
-
-After looking at correlations between poverty rates in each county and Correlation between County Poverty Rate and Aggregate Investment per HH, we analyze if the racial percentage of each household is correlated with aggregate investment in each household (measured in USD). Interestingly, the households with more white racial percentage show higher aggregate investment by household whereas households with more black racial percentage has lower aggregate investment. The mean of the aggregate investment of top 100 counties is approximately 20724 USD. 
-We found this analysis limited since the racial category is not standarized.
-
-## Fourth Visualization
 ```{r}
 counties <- counties(cb = TRUE)
 
@@ -151,6 +95,65 @@ ggplot(
 ```
 
 ### Interpretation
-In order to visualize which county has higher poverty rates within the average scaled investment in 100 largest U.S. counties, we have found that most counties are located over the coasts. Moreover, counties in west coasts and near the border with Mexico tend to have higher poverty rate compared to counties in east coast. 
+
+In order to visualize the poverty rate in the 100 largest U.S. counties, we decided to map it.This allows the reader to observe the location of the counties, as well as their poverty rate. Caveat: we have excluded Honolulu, HI, due to its visibility in the map. As for the results, we can observe some of the poorest counties, listed under the first visualization (e.g: Hidalgo, TX and Fresno, CA). However, there are some drawbacks from this map: it is difficult to observe smaller counties (e.g.: Bronx, NY) due to the scale. A more interesting approach would be to visualize counties per state, focusing on each at a time. Nonetheless, this is an interesting mapping exercise, and this map serves as an initial overview.
+
+## Third Visualization
+
+```{r}
+ggplot(data, aes(x = poverty_perc, y = agg_investment_perhh)) +
+  geom_point(alpha = 0.5, color = "blue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title = "Correlation between County Poverty Rate and Aggregate Investment per HH",
+    x = "Poverty Rate",
+    y = "Aggregate Investment per Household"
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+```
+
+### Interpretation
+
+Following our analysis, we wanted to delve into the relationship between counties with higher poverty rates and the level of aggregate investment per household (measured in USD). The slope of the regression line shows that as poverty grows, investment per household falls. The points are spread out, showing variation, but the trend is clear. Poverty seems to be a meaningful predictor of investment levels, and counties with higher poverty generally attract or sustain less household-level investment. As such, the poorer the household -on average- the more budget constrained and thus the lower willingness to invest. \`\`\`
 
 
+## Fourth Visualization
+
+```{r}
+racial_data <- read_excel("data/dc_capital_flows.xlsx", sheet= 4)
+
+racial_data |>
+  mutate(
+    race_cat = factor(race_cat, levels = c("0-20% white", "21-40% white", "41-60% white", "61-80% white", "81+% white",
+        "0-20% Black", "21-40% Black", "41-60% Black", "61-80% Black", "81+% Black","0-10% Hispanic", "11-20% Hispanic", "21-30% Hispanic", "31+% Hispanic","0-5% Asian", "6-10% Asian", "11-20% Asian", "21+% Asian"
+      )
+      )) |>
+  ggplot(aes(x = reorder(race_cat, agg_investment_perhh), y = agg_investment_perhh)) +
+           geom_bar(stat = "identity", fill = "blue", alpha = 0.7) +
+  scale_y_continuous(labels = scales::dollar) +
+           labs(
+             title = "Race vs Aggregate Investment by racial percentage category",
+             x = "Racial Category",
+             y = "Aggregate Investment",
+             caption = "Source - Urban Data Catalog"
+           ) +
+           theme_light() + 
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1) 
+  )
+
+```
+
+### Interpretation
+
+After looking at correlations between poverty rates in each county and Correlation between County Poverty Rate and Aggregate Investment per HH, we analyze if the racial percentage of each household is correlated with aggregate investment in each household (measured in USD). Interestingly, the households with more white racial percentage show higher aggregate investment by household whereas households with more black racial percentage has lower aggregate investment. The mean of the aggregate investment of top 100 counties is approximately 20724 USD. 
+We found this analysis limited since the racial category is not standarized.
+
+
+###Narrative
+
+Throughout this exercise, we have explored poverty levels at the county level, exploring the heterogeinity in poverty outcomes among the 100 largest countries. To provide a broader picture, we decided to map the counties, and have a first glimpse at the location and poverty rates in a broader sense.
+After this, we explored potential correlations between said poverty levels and variables such as aggregate investment per household, and found that, as expected, investment per household falls as poverty grows. Considering the multidimensional determinants of aggregate investments per household, we decided to explore this variable varies when comparing it among different races. 
