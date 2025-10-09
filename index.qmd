@@ -142,6 +142,7 @@ racial_data |>
       )) |>
   ggplot(aes(x = reorder(race_cat, agg_investment_perhh), y = agg_investment_perhh)) +
            geom_bar(stat = "identity", fill = "blue", alpha = 0.7) +
+  geom_text(aes(label = scales::dollar(agg_investment_perhh)), vjust = -1, size = 1.5) +
   scale_y_continuous(labels = scales::dollar) +
            labs(
              title = "Race vs Aggregate Investment by racial percentage category",
