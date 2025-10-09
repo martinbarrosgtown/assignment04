@@ -63,6 +63,8 @@ ggplot(data %>% filter(poverty_perc > 0.20),
 
 The dataset selected contains information of average scaled investment in 100 largest U.S. counties, plus DC region jurisdictions. Prior to delving into any geospatial analysis, we wanted to understand the heterogeneity of poverty in the top 100 countries. Given that the average poverty rate is 13.3%, we decided to start by taking a look at those countries that have a rate of 20% or higher. To do so, we just present a chart listing those counties and their state, together with a blue dashed line stating the mean poverty rate, and a black dotted line showing the 20% or higher benchmark
 
+## Second Visualization
+
 ```{r}
 ggplot(data, aes(x = poverty_perc, y = agg_investment_perhh)) +
   geom_point(alpha = 0.5, color = "blue") +
@@ -77,7 +79,7 @@ ggplot(data, aes(x = poverty_perc, y = agg_investment_perhh)) +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
 ```
-### Interpretation
-Following our analysis, we wanted to delve into the relationship between counties with higher poverty rates and the level of aggregate investment per household (measured in USD). The slope of the regression line shows that as poverty grows, investment per household falls. The points are spread out, showing variation, but the trend is clear. Poverty seems to be a meaningful predictor of investment levels, and counties with higher poverty generally attract or sustain less household-level investment. As such, the poorer the household -on average- the more budget constrained and thus the lower willingness to invest.
-```
 
+### Interpretation
+
+Following our analysis, we wanted to delve into the relationship between counties with higher poverty rates and the level of aggregate investment per household (measured in USD). The slope of the regression line shows that as poverty grows, investment per household falls. The points are spread out, showing variation, but the trend is clear. Poverty seems to be a meaningful predictor of investment levels, and counties with higher poverty generally attract or sustain less household-level investment. As such, the poorer the household -on average- the more budget constrained and thus the lower willingness to invest. \`\`\`
