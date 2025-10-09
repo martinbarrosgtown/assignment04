@@ -157,3 +157,15 @@ We found this analysis limited since the racial category is not standarized.
 
 Throughout this exercise, we have explored poverty levels at the county level, exploring the heterogeinity in poverty outcomes among the 100 largest countries. To provide a broader picture, we decided to map the counties, and have a first glimpse at the location and poverty rates in a broader sense.
 After this, we explored potential correlations between said poverty levels and variables such as aggregate investment per household, and found that, as expected, investment per household falls as poverty grows. Considering the multidimensional determinants of aggregate investments per household, we decided to explore this variable varies when comparing it among different races. 
+
+### Answer for Stretch question Part 1.4
+After adding the .gitignore file, we typed git add "our data", and this is what the Rstudio showed us: 
+
+Martins-MacBook-Air:assignment04 martinhernanbarros$ git add dc_capital_flows.xlsxThe following paths are ignored by one of your .gitignore files:
+dc_capital_flows.xlsx
+hint: Use -f if you really want to add them.
+hint: Turn this message off by running
+hint: "git config advice.addIgnoredFile false"
+Martins-MacBook-Air:assignment04 martinhernanbarros$
+
+Which shows that our data file has been correctly ignored by .gitignore file. 
