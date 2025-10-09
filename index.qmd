@@ -1,26 +1,67 @@
 ---
-title: "Assignment 04"
-author: "Martin Barros"
+title: "Assignment 04 - Public Data Analysis Urban centers "
+author: "Martin Barros & Yosup Shin"
 format: html
-editor: visual
+editor: "visual"
 ---
 
-## Quarto
+## Data & Setup
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{Assignment 04 report}
-```
-
-You can add options to executable code like this
+-   Dataset source: [Link to source](https://datacatalog.urban.org/dataset/capital-flows-washington-dc-region)
+-   Data kept locally in `data/` and ignored via `.gitignore`.
 
 ```{r}
-#| echo: false
-2 * 2
+# Load required package
+library(readxl)
+library(tidyverse)
+library(scales)
+library(tigris) 
+library(sf)
+
+
+# Read your Excel file from the data/ folder
+data <- read_excel("data/dc_capital_flows.xlsx", sheet = "Top 100 Counties")
+
+# Quick preview of the data
+head(data)
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## First visualization
+
+```{r}
+mean_poverty <- mean(data$poverty_perc, na.rm = TRUE)
+
+mean_poverty <- mean(data$poverty_perc, na.rm = TRUE)
+
+ggplot(data %>% filter(poverty_perc > 0.20),
+       aes(x = reorder(paste0(county_name, ", ", state), poverty_perc),
+           y = poverty_perc)) +
+  geom_col(fill = "lightgreen") +
+  geom_text(aes(label = percent(poverty_perc, accuracy = 0.1)),
+            hjust = -0.05, size = 3.5) +
+  geom_hline(yintercept = 0.20, linetype = "dotted", color = "black", size = 1) +
+  geom_hline(yintercept = mean_poverty, linetype = "dashed", color = "blue", size = 0.4) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(labels = percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0, 0.1))) +
+  labs(title = "Counties with a poverty rate > 20%",
+    subtitle = ("Blue line = Mean poverty rate"),
+    x = NULL,
+    y = "Poverty Rate"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5),
+  )
+
+```
+
+### Interpretation
+
+The dataset selected contains information of average scaled investment in 100 largest U.S. counties, plus DC region jurisdictions. Prior to delving into any geospatial analysis, we wanted to understand the heterogeneity of poverty in the top 100 countries. Given that the average poverty rate is 13.3%, we decided to start by taking a look at those countries that have a rate of 20% or higher. To do so, we just present a chart listing those counties and their state, together with a blue dashed line stating the mean poverty rate, and a black dotted line showing the 20% or higher benchmark
+
+```         
+```
