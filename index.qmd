@@ -14,9 +14,6 @@ editor: "visual"
 # Load required package
 library(readxl)
 library(tidyverse)
-library(scales)
-library(tigris) 
-library(sf)
 
 
 # Read your Excel file from the data/ folder
@@ -115,3 +112,45 @@ racial_data |>
 
 After looking at correlations between poverty rates in each county and Correlation between County Poverty Rate and Aggregate Investment per HH, we analyze if the racial percentage of each household is correlated with aggregate investment in each household (measured in USD). Interestingly, the households with more white racial percentage show higher aggregate investment by household whereas households with more black racial percentage has lower aggregate investment. The mean of the aggregate investment of top 100 counties is approximately 20724 USD. 
 We found this analysis limited since the racial category is not standarized.
+
+## Fourth Visualization
+```{r}
+counties <- counties(cb = TRUE)
+
+counties_in_map <- counties |>
+  filter(!STATEFP %in% c("02","15","60","66","69","72","78")) |>
+  inner_join(data, by = c("GEOID" = "countyfips"))
+
+states <- tigris::states(cb = TRUE, progress_bar = FALSE) |>
+  filter(!STATEFP %in% c("78", "69", "66", "60", "72", "02", "15"))
+
+ggplot(
+  data = counties_in_map
+) +
+  geom_sf(
+    data = states,
+    fill = NA
+  ) +
+  geom_sf(aes(fill = poverty_perc)) +
+    scale_fill_gradient(low = "#cfe8f3", high = "#062635")+
+  labs(
+    title = "Poverty rate by County",
+    fill = "Poverty rate",
+    caption = "Source - Urban Data Catalog",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5),
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.key.height = unit(0.6, "cm"),
+    legend.key.width  = unit(0.5, "cm")
+  ) 
+```
+
+### Interpretation
+In order to visualize which county has higher poverty rates within the average scaled investment in 100 largest U.S. counties, we have found that most counties are located over the coasts. Moreover, counties in west coasts and near the border with Mexico tend to have higher poverty rate compared to counties in east coast. 
+
+
