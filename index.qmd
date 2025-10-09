@@ -29,6 +29,8 @@ head(data)
 ## First visualization
 
 ```{r}
+mean_poverty <- mean(data$poverty_perc, na.rm = TRUE)
+
 ggplot(data %>% filter(poverty_perc > 0.20),
        aes(x = reorder(paste0(county_name, ", ", state), poverty_perc),
            y = poverty_perc)) +
@@ -59,8 +61,15 @@ The dataset selected contains information of average scaled investment in 100 la
 
 ## Second Visualization
 ```{r}
+#| echo: true        # show the code
+#| eval: true        # run it
+#| results: 'hide'   # hide text output
 counties <- counties(cb = TRUE)
+```
 
+
+
+```{r}
 counties_in_map <- counties |>
   filter(!STATEFP %in% c("02","15","60","66","69","72","78")) |>
   inner_join(data, by = c("GEOID" = "countyfips"))
@@ -161,11 +170,11 @@ After this, we explored potential correlations between said poverty levels and v
 ### Answer for Stretch question Part 1.4
 After adding the .gitignore file, we typed git add "our data", and this is what the Rstudio showed us: 
 
-Martins-MacBook-Air:assignment04 martinhernanbarros$ git add dc_capital_flows.xlsxThe following paths are ignored by one of your .gitignore files:
+*Martins-MacBook-Air:assignment04 martinhernanbarros$ git add dc_capital_flows.xlsxThe following paths are ignored by one of your .gitignore files:
 dc_capital_flows.xlsx
 hint: Use -f if you really want to add them.
 hint: Turn this message off by running
 hint: "git config advice.addIgnoredFile false"
-Martins-MacBook-Air:assignment04 martinhernanbarros$
+Martins-MacBook-Air:assignment04 martinhernanbarros$*
 
 Which shows that our data file has been correctly ignored by .gitignore file. 
